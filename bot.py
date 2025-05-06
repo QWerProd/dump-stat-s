@@ -13,7 +13,7 @@ def send_welcome(message):
     bot.send_message(message.from_user.id, texts.start_text)
 
 # Подсказка как начать статистику
-@bot.message_handler(commands=['importFile'])
+@bot.message_handler(commands=['importfile'])
 def start_import(message):
     bot.send_message(message.from_user.id, texts.import_file_text)
     bot.register_next_step_handler(message, get_json_file)
@@ -46,6 +46,13 @@ def get_json_file(message):
 🗑 всего: {stats['total_count']}
 💚 сердец: {stats['hearts']}
 ☠ черепов: {stats['skulls']}
+
+тип полученного мусора:
+🖼 фото: {stats['content_types']['photo']}
+📹 видео: {stats['content_types']['video']}
+🎧 аудио: {stats['content_types']['audio']}
+🌉 гифки: {stats['content_types']['animation']}
+💬 текст: {stats['content_types']['text']}
 
 первое сердце 💚:
 <i>от {stats['first_heart_date']}</i>

@@ -30,7 +30,14 @@ def parse_file(file: str) -> str:
         'first_heart_date': '',
         'first_skull': '',
         'first_skull_date': '',
-        'last_message_date': ''
+        'last_message_date': '',
+        'content_types': {
+            'photo': 0,
+            'video': 0,
+            'audio': 0,
+            'animation': 0,
+            'text': 0
+        }
     }
 
     past_message = {}
@@ -48,6 +55,7 @@ def parse_file(file: str) -> str:
             buttons = i.get('inline_bot_buttons')
             statistics['last_message_date'] = datetime.fromisoformat(i['date']).strftime("%d.%m.%Y %H:%M:%S")
 
+            # Первый старт
             if statistics['first_start'] == '':
                 statistics['first_start'] = datetime.fromisoformat(i['date']).strftime("%d.%m.%Y %H:%M:%S")
 
@@ -75,15 +83,29 @@ def parse_file(file: str) -> str:
                             statistics['first_skull'] = i['text']
                             statistics['first_skull_date'] = datetime.fromisoformat(i['date']).strftime("%d.%m.%Y %H:%M:%S")
 
+                    # Определение типа контента
+                    if 'photo' in i:
+                        statistics['content_types']['photo'] += 1
+                    elif i.get('media_type') == 'video_file':
+                        statistics['content_types']['video'] += 1
+                    elif i.get('media_type') == 'audio_file':
+                        statistics['content_types']['audio'] += 1
+                    elif i.get('media_type') == 'animation':
+                        statistics['content_types']['animation'] += 1
+                    else:
+                        statistics['content_types']['text'] += 1
+
+            ## Отправленные
             elif i['from'] == 'dump' and i['text'] == 'кинул в свалку 🛢️':
                 statistics['your_messages'] += 1
+
+                # Первое сообщение
                 if statistics['first_message'] == '':
                     statistics['first_message'] = past_message['text']
                     statistics['first_message_date'] = datetime.fromisoformat(past_message['date']).strftime("%d.%m.%Y %H:%M:%S")
 
 
             past_message = { 'text': i['text'], 'date': i['date']}
-
 
     
     except KeyError:
@@ -94,8 +116,3 @@ def parse_file(file: str) -> str:
     
     result['result'] = statistics
     return result
-
-
-
-
-#print(parse_file('C:\\Users\\ds\\Downloads\\Telegram Desktop\\ChatExport_2025-05-05\\result.json'))
